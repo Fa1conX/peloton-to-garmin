@@ -13,10 +13,8 @@ on:
         type: boolean
         default: false
   schedule:
-    # Standard Time (Nov–Mar)
-    - cron: '0 16,17,20,21,22,23,2,3,4 * 11-3 *'
-    # Daylight Time (Mar–Nov)
-    #- cron: '0 15,16,19,20,21,22,1,2,3 * 3-11 *'
+    - cron: '0 2,3,4,16,17,20,21,22,23 * * *'
+
 
 env:
   OUTPUT_DIR: /app/output
