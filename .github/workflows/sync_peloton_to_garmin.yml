@@ -34,8 +34,10 @@ jobs:
     - name: 🗃 Create config file
       env:
         DEFAULT_WORKOUT_NUM: 5
+        SAVE_LOCAL_COPY: ${{ toJson(github.event.inputs.saveLocalCopy || false) }}
+        NUM_WORKOUTS: ${{ github.event.inputs.workoutsToDownload || env.DEFAULT_WORKOUT_NUM }}
       run: |
-        cat <<EOT > /app/configuration.local.json 
+        cat <<EOT > /app/configuration.local.json
         {
           "App": {
             "EnablePolling": false,
@@ -46,7 +48,7 @@ jobs:
             "Fit": true,
             "Json": false,
             "Tcx": false,
-            "SaveLocalCopy": ${{ github.event.inputs.saveLocalCopy || false }},
+            "SaveLocalCopy": $SAVE_LOCAL_COPY,
             "IncludeTimeInHRZones": false,
             "IncludeTimeInPowerZones": false,
             "StackedWorkouts": {
@@ -55,38 +57,37 @@ jobs:
             }
           },
           "Peloton": {
-            "NumWorkoutsToDownload": ${{ github.event.inputs.workoutsToDownload || env.DEFAULT_WORKOUT_NUM }},
+            "NumWorkoutsToDownload": $NUM_WORKOUTS
           },
           "Garmin": {
             "Upload": true,
             "FormatToUpload": "fit"
           },
           "Observability": {
-            "Prometheus": {
-              "Enabled": false
-            },
-            "Jaeger": {
-              "Enabled": false
-            },
+            "Prometheus": { "Enabled": false },
+            "Jaeger": { "Enabled": false },
             "Serilog": {
-              "Using": [ "Serilog.Sinks.Console"],
+              "Using": [ "Serilog.Sinks.Console" ],
               "MinimumLevel": "Information"
             }
           }
         }
         EOT
-    
+
+    - name: Validate config JSON
+      run: |
+        python -m json.tool /app/configuration.local.json > /dev/null
+        sed -E 's/("P2G_(PELOTON|GARMIN)__PASSWORD":\s*")[^"]+(")/\1***\2/g' /app/configuration.local.json | sed -n '1,200p'
+
     - name: ▶ Run P2G Sync
+      if: ${{ secrets.P2G_PELOTON__EMAIL && (secrets.P2G_PELOTON__PASSWORD || secrets.P2G_PELOTON__SESSIONID) && secrets.P2G_GARMIN__EMAIL && secrets.P2G_GARMIN__PASSWORD }}
       run: /app/ConsoleClient
-      if: ${{ env.P2G_PELOTON__EMAIL && env.P2G_PELOTON__PASSWORD && env.P2G_GARMIN__EMAIL && env.P2G_GARMIN__PASSWORD }}
       working-directory: /app
       env:
         P2G_PELOTON__EMAIL: ${{ secrets.P2G_PELOTON__EMAIL }}
         P2G_PELOTON__PASSWORD: ${{ secrets.P2G_PELOTON__PASSWORD }}
-        
-        #P2G_PELOTON__BEARERTOKEN: ${{ secrets.P2G_PELOTON__BEARERTOKEN }}
+        # optional token/session fallback
         P2G_PELOTON__SESSIONID: ${{ secrets.P2G_PELOTON__SESSIONID }}
-        
         P2G_GARMIN__EMAIL: ${{ secrets.P2G_GARMIN__EMAIL }}
         P2G_GARMIN__PASSWORD: ${{ secrets.P2G_GARMIN__PASSWORD }}
         TZ: America/Chicago
