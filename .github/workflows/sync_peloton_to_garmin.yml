@@ -13,7 +13,7 @@ on:
         type: boolean
         default: false
   schedule:
-    - cron: '0,30 2,3,4,16,17,20,21,22,23 * * *'
+    - cron: '0 1 * * *'
 
 
 env:
@@ -83,7 +83,7 @@ jobs:
       env:
         P2G_PELOTON__EMAIL: ${{ secrets.P2G_PELOTON__EMAIL }}
         P2G_PELOTON__PASSWORD: ${{ secrets.P2G_PELOTON__PASSWORD }}
-        #P2G_PELOTON__SESSIONID: ${{ secrets.P2G_PELOTON__SESSIONID }}
+        P2G_PELOTON__SESSIONID: ${{ secrets.P2G_PELOTON__SESSIONID }}
         P2G_PELOTON__BEARERTOKEN: ${{ secrets.P2G_PELOTON__BEARERTOKEN }}
         P2G_GARMIN__EMAIL: ${{ secrets.P2G_GARMIN__EMAIL }}
         P2G_GARMIN__PASSWORD: ${{ secrets.P2G_GARMIN__PASSWORD }}
@@ -96,6 +96,7 @@ jobs:
         name: output
         path: ${{ env.OUTPUT_DIR }}
         if-no-files-found: error
+
 
 
 
