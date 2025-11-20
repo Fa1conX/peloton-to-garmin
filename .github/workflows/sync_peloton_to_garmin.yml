@@ -8,13 +8,12 @@ on:
     inputs:
       workoutsToDownload:
         type: number
-        default: "10"
+        default: "5"
       saveLocalCopy:
         type: boolean
         default: false
   schedule:
-    - cron: '0 2,3,4,16,17,20,21,22,23 * * *'
-
+    - cron: '0 1 * * *'
 
 env:
   OUTPUT_DIR: /app/output
@@ -75,7 +74,7 @@ jobs:
           }
         }
         EOT
-        
+    
     - name: ▶ Run P2G Sync
       run: /app/ConsoleClient
       if: ${{ env.P2G_PELOTON__EMAIL && env.P2G_PELOTON__PASSWORD && env.P2G_GARMIN__EMAIL && env.P2G_GARMIN__PASSWORD }}
@@ -83,10 +82,7 @@ jobs:
       env:
         P2G_PELOTON__EMAIL: ${{ secrets.P2G_PELOTON__EMAIL }}
         P2G_PELOTON__PASSWORD: ${{ secrets.P2G_PELOTON__PASSWORD }}
-        
-        P2G_PELOTON__BEARERTOKEN: ${{ secrets.P2G_PELOTON__BEARERTOKEN }}
         P2G_PELOTON__SESSIONID: ${{ secrets.P2G_PELOTON__SESSIONID }}
-        
         P2G_GARMIN__EMAIL: ${{ secrets.P2G_GARMIN__EMAIL }}
         P2G_GARMIN__PASSWORD: ${{ secrets.P2G_GARMIN__PASSWORD }}
         TZ: America/Chicago
@@ -98,7 +94,3 @@ jobs:
         name: output
         path: ${{ env.OUTPUT_DIR }}
         if-no-files-found: error
-
-
-
-
