@@ -50,7 +50,7 @@ jobs:
             "IncludeTimeInHRZones": false,
             "IncludeTimeInPowerZones": false,
             "StackedWorkouts": {
-              "AutomaticallyStackWorkouts": True,
+              "AutomaticallyStackWorkouts": true,
               "MaxAllowedGapSeconds": 300
             }
           },
